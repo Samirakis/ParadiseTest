@@ -164,9 +164,7 @@
 
 
 /mob/living/simple_animal/borer/proc/Communicate(var/sended_message)
-	set category = "Borer"
-	set name = "Converse with Host"
-	set desc = "Send a silent message to your host."
+
 	if(!host)
 		to_chat(src, "У вас нет носителя!")
 		return
@@ -367,7 +365,7 @@
 	user.RemoveBorerSpells()
 	user.GrantInfestActions()
 
-	to_chat(src, span_boldnotice("Вы можете анализировать здоровье носителя при помощи Left-click."))
+	to_chat(user, span_boldnotice("Вы можете анализировать здоровье носителя при помощи Left-click."))
 
 /mob/living/simple_animal/borer/verb/secrete_chemicals()
 	set category = "Borer"
