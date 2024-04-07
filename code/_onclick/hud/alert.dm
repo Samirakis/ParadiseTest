@@ -236,6 +236,31 @@
 	name = "Nearly Discharged"
 	desc = "You're almost drained. The low power makes moving around a chore."
 
+/// Nucleation "hunger"
+
+/obj/screen/alert/hunger/fat/nucleation
+	name = "Over Chemed"
+	desc = "So much!"
+
+/obj/screen/alert/hunger/full/nucleation
+	name = "Full Chem"
+	desc = "Your chemicals is at full."
+
+/obj/screen/alert/hunger/well_fed/nucleation
+	name = "High Chem"
+	desc = "You're almost all chemed, but could top up a bit more."
+
+/obj/screen/alert/hunger/fed/nucleation
+	name = "Half Chemed"
+	desc = "You feel moderately chemed, but a bit more juice couldn't hurt."
+
+/obj/screen/alert/hunger/hungry/nucleation
+	name = "Low Chemical"
+	desc = "Could use a little chemicals right about now."
+
+/obj/screen/alert/hunger/starving/nucleation
+	name = "Nearly Dead"
+	desc = "You're almost drained. The low chemicals makes moving around a chore."
 
 /// Vampire "hunger"
 

@@ -14,7 +14,7 @@
 	blood_color = "#ada776"
 	burn_mod = 4 // holy shite, poor guys wont survive half a second cooking smores
 	brute_mod = 2 // damn, double wham, double dam
-	species_traits = list(LIPS, IS_WHITELISTED, NO_BREATHE, NO_BLOOD, NO_PAIN, NO_PAIN_FEEL, NO_SCAN, RADIMMUNE, VIRUSIMMUNE, NO_GERMS)
+	species_traits = list(LIPS, IS_WHITELISTED, NO_BREATHE, NO_BLOOD, NO_PAIN, NO_PAIN_FEEL, NO_SCAN, RADIMMUNE, VIRUSIMMUNE, NO_GERMS, NO_OBESITY)
 	dies_at_threshold = TRUE
 	var/touched_supermatter = FALSE
 
@@ -22,6 +22,10 @@
 	default_hair = "Nucleation Crystals"
 
 	reagent_tag = PROCESS_ORG
+
+	hunger_icon = 'icons/mob/screen_hunger_nucleation.dmi'
+	hunger_type = "nucleation"
+
 	has_organ = list(
 		INTERNAL_ORGAN_HEART = /obj/item/organ/internal/heart,
 		INTERNAL_ORGAN_BRAIN = /obj/item/organ/internal/brain/crystal,
@@ -33,7 +37,6 @@
 
 
 	meat_type = /obj/item/reagent_containers/food/snacks/meat/humanoid/nucleation
-
 
 /datum/species/nucleation/on_species_gain(mob/living/carbon/human/H)
 	. =..()
@@ -52,15 +55,75 @@
 
 
 /datum/species/nucleation/handle_reagents(mob/living/carbon/human/H, datum/reagent/R)
-	if(R.id == "radium")
-		if(R.volume >= 1)
+	var/reagent_nutrition = 0
+
+	switch(R.id)
+
+		if("radium")
+			if(R.volume < 1)
+				return ..()
 			H.adjustBruteLoss(-3)
 			H.adjustFireLoss(-3)
+			reagent_nutrition = 5
+			H.adjust_nutrition(reagent_nutrition)
 			H.reagents.remove_reagent(R.id, 1)
 			if(H.radiation < 80)
 				H.apply_effect(4, IRRADIATE, negate_armor = 1)
 			return FALSE //Что бы не выводилось больше одного, который уже вывелся за счет прока
+
+		if("uranium") // sugar for nucleations!
+			reagent_nutrition = 5
+		if("polonium") // 3 times more than sugar for unit
+			reagent_nutrition = 15
+		// uranuim-based drinks does 2 times less nutrition than sugar
+		if("atomicbomb")
+			reagent_nutrition = 2.5
+		if("manhattan_proj")
+			reagent_nutrition = 2.5
+		if("threemileisland")
+			reagent_nutrition = 2.5
+		if("nagasaki")
+			reagent_nutrition = 2.5
+		if("singulo")
+			reagent_nutrition = 2.5
+		if("nuka_cola")
+			reagent_nutrition = 2.5
+
+		// mutagens = 5 times less
+		if("mutagen")
+			reagent_nutrition = 1
+		if("stable_mutagen")
+			reagent_nutrition = 1
+			H.adjust_nutrition(reagent_nutrition * R.metabolization_rate * H.metabolism_efficiency * H.digestion_ratio)
+			H.apply_effect(1, IRRADIATE, negate_armor = 1)
+			H.reagents.remove_reagent(R.id, R.metabolization_rate * H.metabolism_efficiency * H.digestion_ratio)
+			return FALSE // stable don`t work on nucleation, just remove it
+
+		// now makes you hungry!
+		if("potass_iodide")
+			reagent_nutrition = -2.5 // -1 nutri/tick
+		if("pen_acid")
+			reagent_nutrition = -17.5 // -7 nutri/tick
+
+		// now can`t make you hungry..
+		if("lipolicide")
+			H.reagents.remove_reagent(R.id, R.metabolization_rate * H.metabolism_efficiency * H.digestion_ratio)
+			return FALSE
+
+		// food makes no nutrition for nucleations, it works only for /reagent/consumable inside nucleation mob, won`t affect reagents in beakers\food
+		else if (istype(R, /datum/reagent/consumable))
+			var/datum/reagent/consumable/Reagent = R
+			if(Reagent.nutriment_factor)
+				Reagent.nutriment_factor = 0
+
+	H.adjust_nutrition(reagent_nutrition * R.metabolization_rate * H.metabolism_efficiency * H.digestion_ratio) // absolutely no one using digestion_ratio, but..
 	return ..()
+
+/datum/species/nucleation/handle_life(mob/living/carbon/human/H)
+	if(H.nutrition < 50)
+		H.adjustBruteLoss(1)
+	..()
+
 
 /datum/species/nucleation/handle_death(gibbed, mob/living/carbon/human/H)
 	if(H.health <= HEALTH_THRESHOLD_DEAD || !H.surgeries.len) // Needed to prevent brain gib on surgery debrain
@@ -71,6 +134,6 @@
 
 /datum/species/nucleation/proc/death_explosion(mob/living/carbon/human/H)
 	var/turf/T = get_turf(H)
-	H.visible_message("<span class='warning'>Тело [H] взрывается, оставляя после себя множество микроскопических кристаллов!</span>")
+	H.visible_message(span_warning("Тело [H] взрывается, оставляя после себя множество микроскопических кристаллов!"))
 	explosion(T, 0, 0, 3, 6, cause = H) // Create a small explosion burst upon death
 	qdel(H)
