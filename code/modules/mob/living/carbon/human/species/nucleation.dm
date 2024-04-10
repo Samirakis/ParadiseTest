@@ -38,6 +38,7 @@
 
 	meat_type = /obj/item/reagent_containers/food/snacks/meat/humanoid/nucleation
 
+
 /datum/species/nucleation/on_species_gain(mob/living/carbon/human/H)
 	. =..()
 	ADD_TRAIT(H, TRAIT_IGNOREDAMAGESLOWDOWN, SPECIES_TRAIT)
