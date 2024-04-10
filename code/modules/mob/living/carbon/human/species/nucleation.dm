@@ -116,12 +116,13 @@
 			var/datum/reagent/consumable/Reagent = R
 			if(Reagent.nutriment_factor)
 				Reagent.nutriment_factor = 0
-
+	if(H.nutrition > NUTRITION_LEVEL_FULL && reagent_nutrition > 0)
+		return ..()
 	H.adjust_nutrition(reagent_nutrition * R.metabolization_rate * H.metabolism_efficiency * H.digestion_ratio) // absolutely no one using digestion_ratio, but..
 	return ..()
 
 /datum/species/nucleation/handle_life(mob/living/carbon/human/H)
-	if(H.nutrition < 50)
+	if(H.nutrition < NUTRITION_LEVEL_HYPOGLYCEMIA - 50) // 50
 		H.adjustBruteLoss(1)
 	..()
 
