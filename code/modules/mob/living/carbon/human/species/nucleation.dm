@@ -68,7 +68,7 @@
 			H.reagents.remove_reagent(R.id, 1)
 			if(H.radiation < 80)
 				H.apply_effect(4, IRRADIATE, negate_armor = 1)
-			if((H.nutrition < NUTRITION_LEVEL_FULL) && !isvampire(H))
+			if((H.nutrition < NUTRITION_LEVEL_FULL - 5) && !isvampire(H))
 				reagent_nutrition = 5 // just for convenience
 				H.adjust_nutrition(reagent_nutrition)
 			return FALSE //Что бы не выводилось больше одного, который уже вывелся за счет прока
@@ -95,7 +95,7 @@
 		if("mutagen")
 			reagent_nutrition = 1
 		if("stable_mutagen")
-			if((H.nutrition < NUTRITION_LEVEL_FULL) && !isvampire(H))
+			if((H.nutrition < NUTRITION_LEVEL_FULL - 5) && !isvampire(H))
 				reagent_nutrition = 1
 				H.adjust_nutrition(reagent_nutrition * R.metabolization_rate * H.metabolism_efficiency * H.digestion_ratio)
 			H.apply_effect(1, IRRADIATE, negate_armor = 1)
@@ -120,7 +120,7 @@
 			var/datum/reagent/consumable/Reagent = R
 			if(Reagent.nutriment_factor)
 				Reagent.nutriment_factor = 0
-	if((H.nutrition > NUTRITION_LEVEL_FULL && reagent_nutrition >= 0) || isvampire(H)) // no abuses for 1000+ nutrition
+	if((H.nutrition > NUTRITION_LEVEL_FULL - 5 && reagent_nutrition >= 0) || isvampire(H)) // no abuses for 1000+ nutrition
 		return ..()
 	H.adjust_nutrition(reagent_nutrition * R.metabolization_rate * H.metabolism_efficiency * H.digestion_ratio) // absolutely no one using digestion_ratio, but..
 	return ..()
