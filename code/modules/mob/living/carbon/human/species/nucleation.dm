@@ -62,7 +62,7 @@
 
 		if("radium")
 			if(R.volume < 1)
-				return ..()
+				return TRUE
 			H.adjustBruteLoss(-3)
 			H.adjustFireLoss(-3)
 			H.reagents.remove_reagent(R.id, 1)
@@ -77,18 +77,9 @@
 			reagent_nutrition = 5
 		if("polonium") // 3 times more than sugar for unit
 			reagent_nutrition = 15
+
 		// uranuim-based drinks does 2 times less nutrition than sugar
-		if("atomicbomb")
-			reagent_nutrition = 2.5
-		if("manhattan_proj")
-			reagent_nutrition = 2.5
-		if("threemileisland")
-			reagent_nutrition = 2.5
-		if("nagasaki")
-			reagent_nutrition = 2.5
-		if("singulo")
-			reagent_nutrition = 2.5
-		if("nuka_cola")
+		if("atomicbomb", "manhattan_proj", "threemileisland", "nagasaki", "singulo", "nuka_cola")
 			reagent_nutrition = 2.5
 
 		// mutagens = 5 times less
@@ -111,7 +102,7 @@
 		// now can`t make you hungry, but..
 		if("lipolicide")
 			if(isvampire(H))
-				return ..() // ..lipolicide works on all vampires
+				return TRUE // ..lipolicide works on all vampires
 			H.reagents.remove_reagent(R.id, R.metabolization_rate * H.metabolism_efficiency * H.digestion_ratio)
 			return FALSE
 
@@ -120,10 +111,10 @@
 			var/datum/reagent/consumable/Reagent = R
 			if(Reagent.nutriment_factor)
 				Reagent.nutriment_factor = 0
-	if((H.nutrition > NUTRITION_LEVEL_FULL - 5 && reagent_nutrition >= 0) || isvampire(H)) // no abuses for 1000+ nutrition
-		return ..()
-	H.adjust_nutrition(reagent_nutrition * R.metabolization_rate * H.metabolism_efficiency * H.digestion_ratio) // absolutely no one using digestion_ratio, but..
-	return ..()
+
+	if(!((H.nutrition > NUTRITION_LEVEL_FULL - 5 && reagent_nutrition >= 0) || isvampire(H))) // no abuses for 1000+ nutrition
+		H.adjust_nutrition(reagent_nutrition * R.metabolization_rate * H.metabolism_efficiency * H.digestion_ratio) // absolutely no one using digestion_ratio, but..
+	return TRUE
 
 /datum/species/nucleation/handle_life(mob/living/carbon/human/H)
 	if(H.nutrition < NUTRITION_LEVEL_HYPOGLYCEMIA - 50) // 50
