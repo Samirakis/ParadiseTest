@@ -2,7 +2,7 @@
 
 /obj/machinery/computer/operating
 	name = "operating computer"
-	density = 1
+	density = TRUE
 	anchored = TRUE
 	icon_keyboard = "med_key"
 	icon_screen = "crew"
@@ -99,7 +99,7 @@
 				occupantData["temperatureSuitability"] = 2
 			else if(occupant.bodytemperature > sp.heat_level_1)
 				occupantData["temperatureSuitability"] = 1
-		else if(istype(occupant, /mob/living/simple_animal))
+		else if(isanimal(occupant))
 			var/mob/living/simple_animal/silly = occupant
 			if(silly.bodytemperature < silly.minbodytemp)
 				occupantData["temperatureSuitability"] = -3

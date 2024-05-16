@@ -79,7 +79,7 @@
 		to_chat(user, "<span class='warning'>You can't dash right now!</span>")
 		return
 
-	if (istype(user.loc,/turf) && !(istype(user.loc,/turf/space)))
+	if (istype(user.loc,/turf) && !(isspaceturf(user.loc)))
 		for(var/mob/M in range(user, 1))
 			if(M.pulling == user)
 				M.stop_pulling()
@@ -106,25 +106,25 @@
 			var/hit = 0
 			T = get_turf(get_step(user,user.dir))
 			if(i < 7)
-				if(istype(T,/turf/simulated/wall))
+				if(iswallturf(T))
 					hit = 1
-				else if(istype(T,/turf/simulated/floor))
+				else if(isfloorturf(T))
 					for(var/obj/structure/S in T.contents)
 						if(istype(S,/obj/structure/window))
 							hit = 1
 						if(istype(S,/obj/structure/grille))
 							hit = 1
 			else if(i > 6)
-				if(istype(T,/turf/simulated/floor))
+				if(isfloorturf(T))
 					for(var/obj/structure/S in T.contents)
 						if(istype(S,/obj/structure/window))
 							S.ex_act(2)
 						if(istype(S,/obj/structure/grille))
 							qdel(S)
-				if(istype(T,/turf/simulated/wall))
+				if(iswallturf(T))
 					var/turf/simulated/wall/W = T
 					var/mob/living/carbon/human/H = user
-					if(istype(T,/turf/simulated/wall/r_wall))
+					if(isreinforcedwallturf(T))
 						playsound(H, 'sound/weapons/tablehit1.ogg', CHANNEL_BUZZ)
 						hit = 1
 						H.Weaken(6 SECONDS)
@@ -145,7 +145,7 @@
 							H.Weaken(4 SECONDS)
 			if(i > 20)
 				user.canmove = FALSE
-				user.density = 0
+				ADD_TRAIT(user, TRAIT_UNDENSE, UNIQUE_TRAIT_SOURCE(src))
 				for(var/mob/living/M in T.contents)
 					if(!M.lying_angle)
 						var/turf/target = get_turf(get_step(user,cur_dir))
@@ -154,7 +154,7 @@
 						for(var/o=0, o<10, o++)
 							target = get_turf(get_step(target,cur_dir))
 						var/mob/living/carbon/human/H = M
-						if(istype(H,/mob/living/carbon/human))
+						if(ishuman(H))
 							var/bodypart_name = pick(BODY_ZONE_CHEST,BODY_ZONE_L_ARM,BODY_ZONE_R_ARM,BODY_ZONE_L_LEG,BODY_ZONE_R_LEG,BODY_ZONE_HEAD,BODY_ZONE_TAIL, BODY_ZONE_WING)
 							var/obj/item/organ/external/BP = H.bodyparts_by_name[bodypart_name]
 							H.apply_damage(20,BRUTE,BP)
@@ -191,14 +191,14 @@
 			else if(i < 30)
 				step(user, cur_dir)
 			sleep(1)
-		user.density = 1
+		REMOVE_TRAIT(user, TRAIT_UNDENSE, UNIQUE_TRAIT_SOURCE(src))
 		user.canmove = TRUE
 		user.layer = prevLayer
 	else
 		to_chat(user, "<span class='warning'>You need a ground to do this!</span>")
 		return
 
-	if (istype(user.loc,/obj))
+	if (isobj(user.loc))
 		var/obj/container = user.loc
 		to_chat(user, "<span class='warning'>You dash and slam your head against the inside of [container]! Ouch!</span>")
 		user.Paralyse(6 SECONDS)
@@ -242,7 +242,7 @@
 		to_chat(user, span_warning("You need a ground to jump from!"))
 		return
 
-	if (istype(user.loc,/turf) && !(istype(user.loc,/turf/space)))
+	if (istype(user.loc,/turf) && !(isspaceturf(user.loc)))
 
 		for(var/mob/M in range(user, 1))
 			if(M.pulling == user)
@@ -265,8 +265,8 @@
 		if(tile)
 			tile.break_tile()
 		var/o=3
+		ADD_TRAIT(user, TRAIT_UNDENSE, UNIQUE_TRAIT_SOURCE(src))
 		for(var/i=0, i<14, i++)
-			user.density = 0
 			user.canmove = FALSE
 			o++
 			if(o == 4)
@@ -282,7 +282,7 @@
 		for(var/mob/living/M in user.loc.contents)
 			if(M != user)
 				var/mob/living/carbon/human/H = M
-				if(istype(H,/mob/living/carbon/human))
+				if(ishuman(H))
 					playsound(H, 'sound/weapons/tablehit1.ogg', CHANNEL_BUZZ)
 					var/bodypart_name = pick(BODY_ZONE_CHEST,BODY_ZONE_L_ARM,BODY_ZONE_R_ARM,BODY_ZONE_L_LEG,BODY_ZONE_R_LEG,BODY_ZONE_HEAD,BODY_ZONE_TAIL, BODY_ZONE_WING)
 					var/obj/item/organ/external/BP = H.bodyparts_by_name[bodypart_name]
@@ -306,14 +306,14 @@
 						spawn(i)
 							if(i < 3) M.pixel_y += 8
 							else M.pixel_y -= 8
-		user.density = 1
+		REMOVE_TRAIT(user, TRAIT_UNDENSE, UNIQUE_TRAIT_SOURCE(src))
 		user.canmove = TRUE
 		user.layer = prevLayer
 	else
 		to_chat(user, "<span class='warning'>You need a ground to do this!</span>")
 		return
 
-	if (istype(user.loc,/obj))
+	if (isobj(user.loc))
 		var/obj/container = user.loc
 		to_chat(user, "<span class='warning'>You leap and slam your head against the inside of [container]! Ouch!</span>")
 		user.Paralyse(6 SECONDS)
@@ -442,7 +442,7 @@
 			user.setDir(1)
 
 		for(var/mob/living/M in view(2, user) - user - user.contents)
-			if(istype(M, /mob/living/carbon/human))
+			if(ishuman(M))
 				var/mob/living/carbon/human/H = M
 				var/bodypart_name = pick(BODY_ZONE_CHEST,BODY_ZONE_L_ARM,BODY_ZONE_R_ARM,BODY_ZONE_L_LEG,BODY_ZONE_R_LEG,BODY_ZONE_HEAD,BODY_ZONE_TAIL, BODY_ZONE_WING)
 				var/obj/item/organ/external/BP = H.bodyparts_by_name[bodypart_name]
@@ -464,7 +464,7 @@
 	damage_type = TOX
 
 /obj/item/projectile/energy/hulkspit/on_hit(atom/target, def_zone = BODY_ZONE_CHEST, blocked = 0)
-	if(istype(target, /mob/living/carbon))
+	if(iscarbon(target))
 		var/mob/living/carbon/M = target
 		M.Weaken(4 SECONDS)
 		M.adjust_fire_stacks(20)

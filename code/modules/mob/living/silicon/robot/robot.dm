@@ -658,24 +658,35 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 
 /mob/living/silicon/robot/proc/ionpulse()
 	if(!ionpulse_on)
-		return
+		return FALSE
 
 	if(!cell || cell.charge <= 50)
-		toggle_ionpulse()
-		return
+		toggle_ionpulse(silent = TRUE)
+		return FALSE
 
 	cell.charge -= 25 // 500 steps on a default cell.
-	return 1
+	return TRUE
 
-/mob/living/silicon/robot/proc/toggle_ionpulse()
+
+/mob/living/silicon/robot/proc/toggle_ionpulse(silent = FALSE)
 	if(!ionpulse)
-		to_chat(src, "<span class='notice'>No thrusters are installed!</span>")
+		if(!silent)
+			to_chat(src, span_notice("No thrusters are installed!"))
 		return
 
 	ionpulse_on = !ionpulse_on
-	to_chat(src, "<span class='notice'>You [ionpulse_on ? null :"de"]activate your ion thrusters.</span>")
+
+	if(ionpulse_on)
+		add_movespeed_modifier(/datum/movespeed_modifier/robot_jetpack_upgrade)
+	else
+		remove_movespeed_modifier(/datum/movespeed_modifier/robot_jetpack_upgrade)
+
+	if(!silent)
+		to_chat(src, span_notice("You [ionpulse_on ? "" : "de"]activate your ion thrusters."))
+
 	if(thruster_button)
 		thruster_button.icon_state = "ionpulse[ionpulse_on]"
+
 
 /mob/living/silicon/robot/blob_act(obj/structure/blob/B)
 	if(stat != DEAD)
@@ -706,8 +717,6 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 		for(var/datum/robot_energy_storage/st in module.storages)
 			stat("[st.name]:", "[st.energy]/[st.max_energy]")
 
-/mob/living/silicon/robot/restrained()
-	return 0
 
 /mob/living/silicon/robot/InCritical()
 	return low_power_mode
@@ -850,7 +859,7 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 			if(U.action(src, user))
 				user.visible_message(span_notice("[user] applied [U] to [src]."), span_notice("You apply [U] to [src]."))
 				install_upgrade(U)
-				module?.fix_modules()	//Set up newly added items with NODROP flag.
+				module?.fix_modules()	//Set up newly added items with NODROP trait.
 			else
 				W.forceMove(drop_location())
 
@@ -1160,6 +1169,8 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 			hat_alpha = inventory_head.alpha
 		if(!hat_color)
 			hat_color = inventory_head.color
+		if(!hat_icon_file)
+			hat_icon_file = inventory_head.onmob_sheets[ITEM_SLOT_HEAD_STRING]
 
 		head_icon = get_hat_overlay()
 		if(head_icon)
@@ -1387,10 +1398,10 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 								floor_only = FALSE
 							else
 								qdel(B)
-					else if(istype(A, /obj/item))
+					else if(isitem(A))
 						var/obj/item/cleaned_item = A
 						cleaned_item.clean_blood()
-					else if(istype(A, /mob/living/carbon/human))
+					else if(ishuman(A))
 						var/mob/living/carbon/human/cleaned_human = A
 						if(cleaned_human.lying_angle)
 							if(cleaned_human.head)

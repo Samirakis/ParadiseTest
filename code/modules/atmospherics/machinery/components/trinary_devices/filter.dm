@@ -32,12 +32,12 @@
 	)
 
 /obj/machinery/atmospherics/trinary/filter/CtrlClick(mob/living/user)
-	if(!istype(user) || user.incapacitated())
+	if(!ishuman(user) && !issilicon(user))
+		return
+	if(user.incapacitated() || HAS_TRAIT(user, TRAIT_HANDS_BLOCKED))
 		to_chat(user, span_warning("You can't do that right now!"))
 		return
-	if(!in_range(src, user) && !issilicon(usr))
-		return
-	if(!ishuman(usr) && !issilicon(usr))
+	if(!in_range(src, user) && !issilicon(user))
 		return
 	toggle()
 
@@ -46,12 +46,12 @@
 	return ..()
 
 /obj/machinery/atmospherics/trinary/filter/AltClick(mob/living/user)
-	if(!istype(user) || user.incapacitated())
+	if(!ishuman(usr) && !issilicon(usr))
+		return
+	if(user.incapacitated() || HAS_TRAIT(user, TRAIT_HANDS_BLOCKED))
 		to_chat(user, span_warning("You can't do that right now!"))
 		return
-	if(!in_range(src, user) && !issilicon(usr))
-		return
-	if(!ishuman(usr) && !issilicon(usr))
+	if(!in_range(src, user) && !issilicon(user))
 		return
 	set_max()
 
@@ -246,7 +246,7 @@
 		investigate_log("was set to [target_pressure] kPa by [key_name_log(usr)]", INVESTIGATE_ATMOS)
 
 /obj/machinery/atmospherics/trinary/filter/attackby(obj/item/W, mob/user, params)
-	if(istype(W, /obj/item/pen))
+	if(is_pen(W))
 		rename_interactive(user, W)
 		return
 	else

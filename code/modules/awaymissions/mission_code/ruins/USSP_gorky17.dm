@@ -310,9 +310,7 @@
 	set name = "Enter name"
 	set category = "Object"
 	set src in oview(1)
-	if(usr.incapacitated())
-		return
-	if(!ishuman(usr))
+	if(!ishuman(usr) || usr.incapacitated() || HAS_TRAIT(usr, TRAIT_HANDS_BLOCKED))
 		return
 
 	var/temp_name = reject_bad_name(input("Enter cardholder name:", "Cardholder name", usr.name), TRUE)
@@ -580,7 +578,7 @@
 			for(var/obj/item/I in A.contents)
 				qdel(I)
 			qdel(A)
-		if(istype(A, /obj/structure/safe) || istype(A, /obj/item/gun))
+		if(istype(A, /obj/structure/safe) || isgun(A))
 			qdel(A)
 
 /obj/item/bombcore/sdg17/defuse()

@@ -67,7 +67,7 @@
 	C.ptype = ptype
 	C.update()
 	C.set_anchored(FALSE)
-	C.density = TRUE
+	C.set_density(TRUE)
 	if(!QDELING(src))
 		qdel(src)
 
@@ -98,7 +98,7 @@
 //This proc returns TRUE if the item can be picked up and FALSE if it can't.
 //Set the stop_messages to stop it from printing messages
 /obj/machinery/disposal/proc/can_be_inserted(obj/item/W, stop_messages = FALSE)
-	if(!istype(W) || (W.flags & ABSTRACT)) //Not an item
+	if(!istype(W) || (W.item_flags & ABSTRACT)) //Not an item
 		return
 
 	if(loc == W)
@@ -117,7 +117,7 @@
 			to_chat(usr, "<span class='notice'>[src] is full, make some space.</span>")
 		return FALSE
 
-	if(W.flags & NODROP) //SHOULD be handled in unEquip, but better safe than sorry.
+	if(HAS_TRAIT(W, TRAIT_NODROP)) //SHOULD be handled in unEquip, but better safe than sorry.
 		to_chat(usr, "<span class='notice'>\the [W] is stuck to your hand, you can't put it in \the [src]</span>")
 		return FALSE
 
@@ -160,7 +160,7 @@
 		for(var/mob/viewer in (viewers(user) - user))
 			viewer.show_message("[user] starts putting [target.name] into the disposal.", 3)
 
-		if(!do_mob(user, target , 2 SECONDS))
+		if(!do_after(user, 2 SECONDS, target, NONE))
 			return
 
 		add_fingerprint(user)
@@ -218,13 +218,13 @@
 	C.ptype = deconstructs_to
 	C.update()
 	C.set_anchored(TRUE)
-	C.density = TRUE
+	C.set_density(TRUE)
 	qdel(src)
 
 // mouse drop another mob or self
 //
 /obj/machinery/disposal/MouseDrop_T(mob/living/target, mob/living/user, params)
-	if(!istype(target) || target.buckled || target.has_buckled_mobs() || !in_range(user, src) || !in_range(user, target) || user.incapacitated() || isAI(user))
+	if(!istype(target) || target.buckled || target.has_buckled_mobs() || !in_range(user, src) || !in_range(user, target) || user.incapacitated() || HAS_TRAIT(user, TRAIT_HANDS_BLOCKED) || isAI(user))
 		return
 	if(isanimal(user) && target != user)
 		return //animals cannot put mobs other than themselves into disposal
@@ -243,7 +243,7 @@
 /obj/machinery/disposal/proc/put_in(mob/living/target, mob/living/user) // need this proc to use INVOKE_ASYNC in other proc. You're not recommended to use that one
 	var/msg
 	var/target_loc = target.loc
-	if(!do_after(usr, 2 SECONDS, target = target))
+	if(!do_after(usr, 2 SECONDS, target))
 		return
 	if(QDELETED(src) || target_loc != target.loc)
 		return
@@ -251,7 +251,7 @@
 											// must be awake, not stunned or whatever
 		msg = "[user.name] climbs into [src]."
 		to_chat(user, "You climb into [src].")
-	else if(target != user && !user.restrained() && !user.incapacitated())
+	else if(target != user && !user.incapacitated() && !HAS_TRAIT(user, TRAIT_HANDS_BLOCKED))
 		msg = "[user.name] stuffs [target.name] into [src]!"
 		to_chat(user, "You stuff [target.name] into [src]!")
 		if(!iscarbon(user))
@@ -377,13 +377,13 @@
 
 
 /obj/machinery/disposal/AltClick(mob/user)
-	if(!Adjacent(user) || !ishuman(user) || user.incapacitated())
+	if(!Adjacent(user) || !ishuman(user) || user.incapacitated() || HAS_TRAIT(user, TRAIT_HANDS_BLOCKED))
 		return ..()
 	user.visible_message(
 		"<span class='notice'>[user] tries to eject the contents of [src] manually.</span>",
 		"<span class='notice'>You operate the manual ejection lever on [src].</span>"
 	)
-	if(!do_after(user, 5 SECONDS, target = src))
+	if(!do_after(user, 5 SECONDS, src))
 		return ..()
 
 	user.visible_message(
@@ -527,13 +527,9 @@
 
 // called when area power changes
 /obj/machinery/disposal/power_change(forced = FALSE)
-	if(!..())
-		return	// do default setting/reset of stat NOPOWER bit
-	update()	// update icon
-	if(stat & NOPOWER)
-		set_light_on(FALSE)
-	else
-		set_light(1, LIGHTING_MINIMUM_POWER, l_on = TRUE)
+	. = ..()
+	if(.)
+		update()	// do default setting/reset of stat NOPOWER bit
 
 
 // called when holder is expelled from a disposal
@@ -628,9 +624,9 @@
 
 /obj/machinery/disposal/deliveryChute/Bumped(atom/movable/moving_atom) //Go straight into the chute
 	..()
-	if(istype(moving_atom, /obj/mecha) || istype(moving_atom, /obj/spacepod)) return
+	if(ismecha(moving_atom) || isspacepod(moving_atom)) return
 
-	if(istype(moving_atom, /obj/item/projectile) || istype(moving_atom, /obj/effect))
+	if(isprojectile(moving_atom) || iseffect(moving_atom))
 		return
 
 	switch(dir)
@@ -651,7 +647,7 @@
 
 
 /obj/machinery/disposal/deliveryChute/hitby(atom/movable/AM, skipcatch, hitpush, blocked, datum/thrownthing/throwingdatum)
-	if(istype(AM, /obj/item/projectile))
+	if(isprojectile(AM))
 		return ..() //chutes won't eat bullets
 	if(dir == reverse_direction(throwingdatum.init_dir))
 		return

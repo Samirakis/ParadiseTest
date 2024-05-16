@@ -5,7 +5,7 @@
 	desc = "A device that delivers powerful shocks to detachable paddles that resuscitate incapacitated patients."
 	icon_state = "defibunit"
 	item_state = "defibunit"
-	slot_flags = SLOT_FLAG_BACK
+	slot_flags = ITEM_SLOT_BACK
 	force = 5
 	throwforce = 6
 	w_class = WEIGHT_CLASS_BULKY
@@ -113,7 +113,7 @@
 
 
 /obj/item/defibrillator/CtrlClick(mob/user)
-	if(!ishuman(user) || !Adjacent(user))
+	if(!ishuman(user) || user.incapacitated() || HAS_TRAIT(user, TRAIT_HANDS_BLOCKED) || !Adjacent(user))
 		return
 
 	toggle_paddles(user)
@@ -178,6 +178,9 @@
 	set category = "Object"
 	set src in oview(1)
 
+	if(usr.incapacitated() || HAS_TRAIT(usr, TRAIT_HANDS_BLOCKED))
+		return
+
 	toggle_paddles(usr)
 
 
@@ -233,12 +236,12 @@
 
 /obj/item/defibrillator/equipped(mob/user, slot)
 	. = ..()
-	if(slot != SLOT_HUD_BACK)
+	if(slot != ITEM_SLOT_BACK)
 		retrieve_paddles(user)
 
 
 /obj/item/defibrillator/item_action_slot_check(slot, mob/user)
-	return slot == SLOT_HUD_BACK
+	return slot == ITEM_SLOT_BACK
 
 
 /obj/item/defibrillator/proc/deductcharge(chrgdeductamt)
@@ -259,11 +262,11 @@
 	icon_state = "defibcompact"
 	item_state = "defibcompact"
 	w_class = WEIGHT_CLASS_NORMAL
-	slot_flags = SLOT_FLAG_BELT
+	slot_flags = ITEM_SLOT_BELT
 	origin_tech = "biotech=5"
 
 /obj/item/defibrillator/compact/item_action_slot_check(slot, mob/user)
-	if(slot == SLOT_HUD_BELT)
+	if(slot == ITEM_SLOT_BELT)
 		return TRUE
 
 /obj/item/defibrillator/compact/loaded/Initialize(mapload)
@@ -329,7 +332,7 @@
 	w_class = WEIGHT_CLASS_BULKY
 	resistance_flags = INDESTRUCTIBLE
 	toolspeed = 1
-	flags = ABSTRACT
+	item_flags = ABSTRACT
 	/// Amount of power used on a shock.
 	var/revivecost = 1000
 	/// Active defib this is connected to.

@@ -27,28 +27,31 @@ Thus, the two variables affect pump operation are set in New():
 	var/id = null
 
 /obj/machinery/atmospherics/binary/pump/CtrlClick(mob/living/user)
-	if(!istype(user) || user.incapacitated())
+	if(!ishuman(user) && !issilicon(user))
+		return
+	if(user.incapacitated() || HAS_TRAIT(user, TRAIT_HANDS_BLOCKED))
 		to_chat(user, span_warning("You can't do that right now!"))
 		return
-	if(!in_range(src, user) && !issilicon(usr))
-		return
-	if(!ishuman(usr) && !issilicon(usr))
+	if(!in_range(src, user) && !issilicon(user))
 		return
 	toggle()
+
 
 /obj/machinery/atmospherics/binary/pump/AICtrlClick()
 	toggle()
 	return ..()
 
+
 /obj/machinery/atmospherics/binary/pump/AltClick(mob/living/user)
-	if(!istype(user) || user.incapacitated())
+	if(!ishuman(user) && !issilicon(user))
+		return
+	if(user.incapacitated() || HAS_TRAIT(user, TRAIT_HANDS_BLOCKED))
 		to_chat(user, span_warning("You can't do that right now!"))
 		return
-	if(!in_range(src, user) && !issilicon(usr))
-		return
-	if(!ishuman(usr) && !issilicon(usr))
+	if(!in_range(src, user) && !issilicon(user))
 		return
 	set_max()
+
 
 /obj/machinery/atmospherics/binary/pump/AIAltClick()
 	set_max()
@@ -228,7 +231,7 @@ Thus, the two variables affect pump operation are set in New():
 	update_icon()
 
 /obj/machinery/atmospherics/binary/pump/attackby(obj/item/W, mob/user, params)
-	if(istype(W, /obj/item/pen))
+	if(is_pen(W))
 		rename_interactive(user, W)
 		return
 	else if(W.tool_behaviour != TOOL_WRENCH)

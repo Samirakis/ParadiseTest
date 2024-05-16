@@ -39,13 +39,9 @@
 
 
 /obj/machinery/flasher/power_change(forced = FALSE)
-	if(!..())
-		return
-	if(stat & NOPOWER)
-		set_light_on(FALSE)
-	else
-		set_light(1, LIGHTING_MINIMUM_POWER)
-	update_icon()
+	. = ..()
+	if(.)
+		update_icon()
 
 
 /obj/machinery/flasher/update_icon_state()
@@ -112,7 +108,7 @@
 	if((disable) || (last_flash && world.time < last_flash + 150))
 		return
 
-	if(istype(AM, /mob/living/carbon))
+	if(iscarbon(AM))
 		var/mob/living/carbon/M = AM
 		if((M.m_intent != MOVE_INTENT_WALK) && (anchored))
 			flash()

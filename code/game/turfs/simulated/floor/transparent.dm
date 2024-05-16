@@ -30,7 +30,7 @@
 	AddElement(/datum/element/turf_z_transparency)
 	var/turf/T = GET_TURF_BELOW(src)
 	if(T)
-		if(!istype(T, /turf/space))
+		if(!isspaceturf(T))
 			light_power = 0
 			light_range = 0
 			update_light()
@@ -71,7 +71,7 @@
 		else
 			to_chat(user, span_notice("You begin replacing [src]..."))
 			playsound(src, I.usesound, 80, TRUE)
-			if(do_after(user, 3 SECONDS * I.toolspeed * gettoolspeedmod(user), target = src))
+			if(do_after(user, 3 SECONDS * I.toolspeed * gettoolspeedmod(user), src))
 				if(R.get_amount() < 2 || !transparent_floor)
 					return
 			else
@@ -118,7 +118,7 @@
 /turf/simulated/floor/glass/proc/reset_light()
 	light_process = 0
 	var/turf/below = GET_TURF_BELOW(src)
-	if(istype(below, /turf/space))
+	if(isspaceturf(below))
 		light_power = initial(light_power)
 		light_range = initial(light_range)
 		update_light()

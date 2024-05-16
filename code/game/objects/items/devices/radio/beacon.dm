@@ -40,7 +40,7 @@
 	set category = "Object"
 	set src in usr
 
-	if(usr.stat || usr.restrained())
+	if(usr.incapacitated() || HAS_TRAIT(usr, TRAIT_HANDS_BLOCKED))
 		return
 
 	code = t
@@ -272,6 +272,11 @@
 								/obj/item/card/id/syndicate = 1,											// 10 TK
 								/obj/item/encryptionkey/syndicate = 1)										// 0-5 TK
 	)
+
+/obj/item/radio/beacon/syndicate/bundle/magical //for d20 dice of fate
+	used = TRUE
+	name = "suspicious 'magical' beacon"
+	desc = "It looks battered and old, as if someone tried to crack it with brute force."
 
 /obj/item/radio/beacon/syndicate/bundle/Initialize()
 	. = ..()

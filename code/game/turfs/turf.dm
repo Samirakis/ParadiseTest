@@ -345,6 +345,15 @@
 
 	dynamic_lumcount = old_dynamic_lumcount
 
+	// we need to refresh gravity for all living mobs to cover possible gravity change
+	for(var/mob/living/mob in contents)
+		if(HAS_TRAIT(mob, TRAIT_NEGATES_GRAVITY))
+			if(!isgroundlessturf(src))
+				ADD_TRAIT(mob, TRAIT_IGNORING_GRAVITY, IGNORING_GRAVITY_NEGATION)
+			else
+				REMOVE_TRAIT(mob, TRAIT_IGNORING_GRAVITY, IGNORING_GRAVITY_NEGATION)
+		mob.refresh_gravity()
+
 	if(SSlighting.initialized)
 		recalc_atom_opacity()
 		lighting_object = old_lighting_object
@@ -413,10 +422,6 @@
 
 /turf/proc/Bless()
 	flags |= NOJAUNT
-
-// Defined here to avoid runtimes
-/turf/proc/MakeDry(wet_setting = TURF_WET_WATER)
-	return
 
 /turf/proc/burn_down()
 	return
@@ -607,9 +612,9 @@
 
 /turf/proc/add_blueprints(atom/movable/AM)
 	var/image/I = new
-	I.plane = GAME_PLANE
-	I.layer = OBJ_LAYER
 	I.appearance = AM.appearance
+	SET_PLANE(I, GAME_PLANE, src)
+	I.layer = GHOST_LAYER + AM.layer
 	I.appearance_flags = RESET_COLOR|RESET_ALPHA|RESET_TRANSFORM
 	I.loc = src
 	I.setDir(AM.dir)

@@ -94,7 +94,7 @@
 		else
 			user.visible_message("<span class='notice'>[user] begins to install the [O] into [src]...</span>", \
 				"<span class='notice'>You start to install the [O] into [src]...</span>")
-			if(do_after(user, 20, target=src))
+			if(do_after(user, 2 SECONDS, src))
 				if(user.drop_transfer_item_to_loc(O, src))
 					user.visible_message("<span class='notice'>[user] installs [O] in [src].</span>", \
 						"<span class='notice'>You install [O] in [src].</span>")
@@ -253,12 +253,12 @@
 // Also neatly handles basically every case where a brain
 // is inserted or removed from an MMI
 /obj/item/mmi/Entered(atom/movable/A)
-	if(radio && istype(A, /mob/living/carbon/brain))
+	if(radio && isbrain(A))
 		radio_action.Grant(A)
 
 /obj/item/mmi/Exited(atom/movable/A)
 	..()
-	if(radio && istype(A, /mob/living/carbon/brain))
+	if(radio && isbrain(A))
 		radio_action.Remove(A)
 
 /obj/item/mmi/syndie

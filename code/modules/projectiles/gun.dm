@@ -6,7 +6,7 @@
 	item_state = "gun"
 	appearance_flags = TILE_BOUND|PIXEL_SCALE|KEEP_TOGETHER
 	flags =  CONDUCT
-	slot_flags = SLOT_FLAG_BELT
+	slot_flags = ITEM_SLOT_BELT
 	materials = list(MAT_METAL=2000)
 	w_class = WEIGHT_CLASS_NORMAL
 	throwforce = 5
@@ -147,12 +147,12 @@
 
 
 /obj/item/gun/proc/process_chamber()
-	return 0
+	return FALSE
 
 //check if there's enough ammo/energy/whatever to shoot one time
 //i.e if clicking would make it shoot
-/obj/item/gun/proc/can_shoot()
-	return 1
+/obj/item/gun/proc/can_shoot(mob/user)
+	return TRUE
 
 /obj/item/gun/proc/shoot_with_empty_chamber(mob/living/user)
 	to_chat(user, span_danger("*click*"))
@@ -397,7 +397,7 @@
 				update_gun_light()
 
 	if(unique_rename)
-		if(istype(I, /obj/item/pen))
+		if(is_pen(I))
 			var/t = rename_interactive(user, I, use_prefix = FALSE)
 			if(!isnull(t))
 				to_chat(user, "<span class='notice'>You name the gun [name]. Say hello to your new friend.</span>")
@@ -482,7 +482,7 @@
 		gun_light.set_light_on(FALSE)
 
 	update_icon(UPDATE_OVERLAYS)
-	update_equipped_item()
+	update_equipped_item(update_speedmods = FALSE)
 
 
 /obj/item/gun/proc/clear_bayonet()
@@ -511,7 +511,7 @@
 /obj/item/gun/AltClick(mob/user)
 	if(!unique_reskin || current_skin || loc != user)
 		return ..()
-	if(user.incapacitated())
+	if(user.incapacitated() || HAS_TRAIT(user, TRAIT_HANDS_BLOCKED))
 		to_chat(user, span_warning("You can't do that right now!"))
 		return ..()
 	reskin_gun(user)
@@ -530,7 +530,7 @@
 		current_skin = skin_options[choice]
 		to_chat(user, "Your gun is now skinned as [choice]. Say hello to your new friend.")
 		update_icon()
-		update_equipped_item()
+		update_equipped_item(update_speedmods = FALSE)
 
 
 /obj/item/gun/proc/reskin_radial_check(mob/living/carbon/human/user)
@@ -555,7 +555,7 @@
 
 	semicd = 1
 
-	if(!do_mob(user, target, 120) || user.zone_selected != "mouth")
+	if(!do_after(user, 12 SECONDS, target, NONE) || user.zone_selected != BODY_ZONE_PRECISE_MOUTH)
 		if(user)
 			if(user == target)
 				user.visible_message("<span class='notice'>[user] decided life was worth living.</span>")
@@ -651,7 +651,7 @@
  */
 /obj/item/gun/proc/ZoomGrantCheck(datum/source, mob/user, slot)
 	// Checks if the gun got equipped into either of the user's hands.
-	if(slot != SLOT_HUD_RIGHT_HAND && slot != SLOT_HUD_LEFT_HAND)
+	if(!(slot & ITEM_SLOT_HANDS))
 		// If its not in their hands, un-zoom, and remove the zoom action button.
 		zoom(user, FALSE)
 		azoom.Remove(user)

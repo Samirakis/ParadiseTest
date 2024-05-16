@@ -7,7 +7,7 @@
 	icon_state = "foam"
 	opacity = 0
 	anchored = TRUE
-	density = 0
+	density = FALSE
 	layer = OBJ_LAYER + 0.9
 	animate_movement = 0
 	var/amount = 3
@@ -29,7 +29,7 @@
 
 		if(metal)
 			var/turf/T = get_turf(src)
-			if(istype(T, /turf/space) && !istype(T, /turf/space/transit))
+			if(isspaceturf(T) && !istype(T, /turf/space/transit))
 				T.ChangeTurf(/turf/simulated/floor/plating/metalfoam)
 				var/turf/simulated/floor/plating/metalfoam/MF = get_turf(src)
 				MF.metal = metal
@@ -100,7 +100,7 @@
 
 	if(iscarbon(AM))
 		var/mob/living/carbon/M = AM
-		if(M.slip("foam", 4 SECONDS))
+		if(M.slip(4 SECONDS))
 			if(reagents)
 				for(var/reagent_id in reagents.reagent_list)
 					var/amount = M.reagents.get_reagent_amount(reagent_id)

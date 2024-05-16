@@ -8,7 +8,7 @@
 	var/icon_state_full = "soulstone2"
 	desc = "A fragment of the legendary treasure known simply as the 'Soul Stone'. The shard still flickers with a fraction of the full artifact's power."
 	w_class = WEIGHT_CLASS_TINY
-	slot_flags = SLOT_FLAG_BELT
+	slot_flags = ITEM_SLOT_BELT
 	origin_tech = "bluespace=4;materials=5"
 
 	/// Does this soulstone ask the victim whether they want to be turned into a shade
@@ -180,7 +180,7 @@
 			return
 		to_chat(user, "<span class='notice'>You begin to exorcise [src].</span>")
 		playsound(src, 'sound/hallucinations/veryfar_noise.ogg', 40, TRUE)
-		if(do_after(user, 40, target = src))
+		if(do_after(user, 4 SECONDS, src))
 			usability = TRUE
 			purified = TRUE
 			optional = TRUE
@@ -194,7 +194,7 @@
 						to_chat(M, "<span class='danger'>Assist [user], your saviour, and get vengeance on those who enslaved you!</span>")
 					else
 						to_chat(M, "<span class='danger'>Your soulstone has been exorcised, and you are now bound to obey [user].</span>")
-				if(istype(M, /mob/living/simple_animal/shade))
+				if(isshade(M))
 					var/mob/living/simple_animal/shade/shade = M
 					shade.holy = TRUE
 					shade.update_icon(UPDATE_ICON_STATE)
@@ -204,7 +204,7 @@
 		if(!purified)
 			return
 		to_chat(user, "<span class='notice'>You begin to cleanse [src] of holy magic.</span>")
-		if(do_after(user, 40, target = src))
+		if(do_after(user, 4 SECONDS, src))
 			usability = FALSE
 			purified = FALSE
 			optional = FALSE
@@ -213,7 +213,7 @@
 				if(M.mind)
 					SSticker.mode.add_cultist(M.mind)
 					to_chat(M, "<span class='cult'>Your shard has been cleansed of holy magic, and you are now bound to the cult's will. Obey them and assist in their goals.</span>")
-				if(istype(M, /mob/living/simple_animal/shade))
+				if(isshade(M))
 					var/mob/living/simple_animal/shade/shade = M
 					shade.holy = FALSE
 					shade.update_icon(UPDATE_ICON_STATE)
@@ -315,7 +315,7 @@
 		SS.transfer_soul("CONSTRUCT", src, user)
 		return
 	if(istype(I, /obj/item/melee/cultblade/dagger) && iscultist(user))
-		if(do_after(user, 4 SECONDS, target = src))
+		if(do_after(user, 4 SECONDS, src))
 			user.visible_message("<span class='warning'>[user] defile [src] with dark magic!!</span>", "<span class='cult'>You sanctified [src]. Yes-yes. I need more acolytes!</span>")
 			update_appearance(UPDATE_ICON_STATE|UPDATE_NAME|UPDATE_DESC)
 		return

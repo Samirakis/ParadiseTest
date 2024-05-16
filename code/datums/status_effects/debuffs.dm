@@ -92,6 +92,7 @@
 	var/delay_before_decay = 5
 	var/bleed_damage = 200
 	var/needs_to_bleed = FALSE
+	var/bleed_cap = 10
 
 /datum/status_effect/saw_bleed/Destroy()
 	if(owner)
@@ -128,7 +129,7 @@
 	owner.underlays -= bleed_underlay
 	bleed_amount += amount
 	if(bleed_amount)
-		if(bleed_amount >= 10)
+		if(bleed_amount >= bleed_cap)
 			needs_to_bleed = TRUE
 			qdel(src)
 		else
@@ -151,6 +152,12 @@
 		owner.adjustBruteLoss(bleed_damage)
 	else
 		new /obj/effect/temp_visual/bleed(get_turf(owner))
+
+/datum/status_effect/saw_bleed/bloodletting
+	id = "bloodletting"
+	bleed_cap = 7
+	bleed_damage = 25 //Seems weak (it is) but it also works on humans and bypasses armor SOOOO
+	bleed_amount = 6
 
 /datum/status_effect/stamina_dot
 	id = "stamina_dot"
@@ -239,17 +246,17 @@
 	if(t_hearts && prob(t_hearts * 10))	// 60% on MAX
 		owner.adjustFireLoss(t_hearts)	// 6 MAX
 
-	if(!owner.incapacitated() && prob(30 + t_eyes * 7))	// 100% on MAX
+	if(!owner.incapacitated() && !HAS_TRAIT(owner, TRAIT_HANDS_BLOCKED) && prob(30 + t_eyes * 7))	// 100% on MAX
 		// lets check our arms first
 		var/obj/item/left_hand = owner.l_hand
 		var/obj/item/right_hand = owner.r_hand
 
 		// next we will find THE GUN .\_/.
 		var/obj/item/gun/found_gun
-		if(istype(left_hand, /obj/item/gun))
+		if(isgun(left_hand))
 			found_gun = left_hand
 
-		if(!found_gun && istype(right_hand, /obj/item/gun))
+		if(!found_gun && isgun(right_hand))
 			found_gun = right_hand
 
 		// now we will find the target
@@ -606,6 +613,8 @@
 	status_type = STATUS_EFFECT_REPLACE
 	alert_type = null
 	var/needs_update_stat = FALSE
+	var/list/traits_to_apply
+
 
 /datum/status_effect/incapacitating/on_creation(mob/living/new_owner, set_duration)
 	if(isnum(set_duration))
@@ -618,26 +627,41 @@
 	. = ..()
 	if(. && (needs_update_stat || issilicon(owner)))
 		owner.update_stat()
-	owner.update_canmove()
+	owner?.update_canmove()
+
+
+/datum/status_effect/incapacitating/on_apply()
+	. = ..()
+	if(traits_to_apply)
+		owner.add_traits(traits_to_apply, TRAIT_STATUS_EFFECT(id))
 
 
 /datum/status_effect/incapacitating/on_remove()
 	if(needs_update_stat || issilicon(owner)) //silicons need stat updates in addition to normal canmove updates
 		owner.update_stat()
+	if(traits_to_apply)
+		owner.remove_traits(traits_to_apply, TRAIT_STATUS_EFFECT(id))
 	owner.update_canmove()
 	return ..()
+
 
 //STUN - prevents movement and actions, victim stays standing
 /datum/status_effect/incapacitating/stun
 	id = "stun"
+	traits_to_apply = list(TRAIT_HANDS_BLOCKED)
+
 
 //IMMOBILIZED - prevents movement, victim can still stand and act
 /datum/status_effect/incapacitating/immobilized
 	id = "immobilized"
+	traits_to_apply = list(TRAIT_IMMOBILIZED)
+
 
 //WEAKENED - prevents movement and action, victim falls over
 /datum/status_effect/incapacitating/weakened
 	id = "weakened"
+	traits_to_apply = list(TRAIT_HANDS_BLOCKED)
+
 
 //PARALYZED - prevents movement and action, victim falls over, victim cannot hear or see.
 /datum/status_effect/incapacitating/paralyzed
