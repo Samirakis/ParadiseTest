@@ -1590,23 +1590,11 @@ Eyes need to have significantly high darksight to shine unless the mob has the X
 
 	return ..()
 
+
 /mob/living/carbon/human/proc/get_age_pitch(tolerance = 5)
 	var/age_limits = get_age_limits(dna?.species, list(SPECIES_AGE_MIN, SPECIES_AGE_MAX))
 	return 1.0 + 0.5 * (age_limits[SPECIES_AGE_MIN] + 10 - age) / age_limits[SPECIES_AGE_MAX] + (0.01 * rand(-tolerance, tolerance))
 
-/datum/keybinding/client/testshit
-	name = "huy"
-	keys = list("P")
-
-
-/datum/keybinding/client/testshit/down(client/user)
-	. = ..()
-	if(.)
-		return .
-	var/age = tgui_input_number(user, "input test", "test", 0, 1000000, 0)
-	var/a = 1 + 0.5*(30 - age)/80
-	to_chat(user, "Result: [a]; Input: [age].")
-	return TRUE
 
 /mob/living/carbon/human/get_access_locations()
 	. = ..()
