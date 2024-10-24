@@ -1592,8 +1592,12 @@ Eyes need to have significantly high darksight to shine unless the mob has the X
 
 
 /mob/living/carbon/human/proc/get_age_pitch(tolerance = 5)
-	var/age_limits = get_age_limits(dna?.species, list(SPECIES_AGE_MIN, SPECIES_AGE_MAX))
-	return 1.0 + 0.5 * (age_limits[SPECIES_AGE_MIN] + 10 - age) / age_limits[SPECIES_AGE_MAX] + (0.01 * rand(-tolerance, tolerance))
+	var/datum/species/species = dna?.species
+
+	if(!species)
+		return 1.0 + 0.5*(30 - age)/80 + (0.01*rand(-tolerance,tolerance))
+
+	return species.get_emote_pitch(src, tolerance)
 
 
 /mob/living/carbon/human/get_access_locations()

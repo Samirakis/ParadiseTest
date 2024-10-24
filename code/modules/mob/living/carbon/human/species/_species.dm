@@ -1212,3 +1212,6 @@ It'll return null if the organ doesn't correspond, so include null checks when u
 		var/obj/item/organ/external/head/HD = H.get_organ(BODY_ZONE_HEAD)
 		return HD.hair_colour
 
+/datum/species/proc/get_emote_pitch(mob/living/carbon/human/H, tolerance)
+	var/age_limits = get_age_limits(name, list(SPECIES_AGE_MIN, SPECIES_AGE_MAX))
+	return 1 + 0.5 * (age_limits[SPECIES_AGE_MIN] + 10 - H.age) / age_limits[SPECIES_AGE_MAX] + (0.01 * rand(-tolerance, tolerance))

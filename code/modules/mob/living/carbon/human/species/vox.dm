@@ -188,6 +188,11 @@
 
 	return ..()
 
+
+/datum/species/vox/get_emote_pitch(mob/living/carbon/human/H, tolerance)
+	return 1 + (0.01*rand(-tolerance,tolerance))
+
+
 /datum/species/vox/armalis
 	name = SPECIES_VOX_ARMALIS
 	name_plural = "Vox Armalis"

@@ -1,5 +1,6 @@
 #define DRASK_COOLINGSTARTTEMP 280
 #define ENVIRONMENT_COOLINGSTOPTEMP 400
+#define DRASK_PITCH_SHIFT -0.15 // a bit lower emotes
 
 /datum/species/drask
 	name = SPECIES_DRASK
@@ -81,6 +82,12 @@
 
 	disliked_food = SUGAR | GROSS
 	liked_food = DAIRY
+	age_sheet = list(
+		SPECIES_AGE_MIN = 30,
+		SPECIES_AGE_MAX = 999,
+		JOB_MIN_AGE_HIGH_ED = 50,
+		JOB_MIN_AGE_COMMAND = 50,
+	)
 	special_diet = MATERIAL_CLASS_SOAP
 
 /datum/species/drask/get_species_runechat_color(mob/living/carbon/human/H)
@@ -123,5 +130,11 @@
 			return FALSE
 	return ..()
 
+/datum/species/drask/get_emote_pitch(mob/living/carbon/human/H, tolerance)
+	. = ..()
+	. += DRASK_PITCH_SHIFT
+
+
 #undef DRASK_COOLINGSTARTTEMP
 #undef ENVIRONMENT_COOLINGSTOPTEMP
+#undef DRASK_PITCH_SHIFT

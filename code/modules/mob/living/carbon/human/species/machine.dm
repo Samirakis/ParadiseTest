@@ -92,6 +92,12 @@
 	speciesbox = /obj/item/storage/box/survival_machine
 
 	liked_food = NONE
+	age_sheet = list(
+		SPECIES_AGE_MIN = 1,
+		SPECIES_AGE_MAX = 58,
+		JOB_MIN_AGE_HIGH_ED = 15,
+		JOB_MIN_AGE_COMMAND = 15,
+	)
 	disliked_food = NONE
 	toxic_food = NONE
 
@@ -185,3 +191,7 @@
 			H.change_hair(new_style, 1)							// The 1 is to enable custom sprites
 		if(new_color)
 			H.change_hair_color(new_color)
+
+
+/datum/species/machine/get_emote_pitch(mob/living/carbon/human/H, tolerance)
+	return 1 + (0.01*rand(-tolerance,tolerance))
