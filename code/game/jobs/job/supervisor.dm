@@ -13,7 +13,7 @@ GLOBAL_DATUM_INIT(captain_announcement, /datum/announcement/minor, new(do_newsca
 	access = list() 			//See get_access()
 	minimal_access = list() 	//See get_access()
 	minimal_player_age = 30
-	min_age_allowed = 30
+	min_age_type = JOB_MIN_AGE_COMMAND
 	blocked_race_for_job = list(SPECIES_VOX)
 	exp_requirements = 3000
 	exp_type = EXP_TYPE_COMMAND
@@ -72,7 +72,7 @@ GLOBAL_DATUM_INIT(captain_announcement, /datum/announcement/minor, new(do_newsca
 	req_admin_notify = 1
 	is_command = 1
 	minimal_player_age = 21
-	min_age_allowed = 30
+	min_age_type = JOB_MIN_AGE_COMMAND
 	blocked_race_for_job = list(SPECIES_VOX)
 	exp_requirements = 1200
 	exp_type = EXP_TYPE_COMMAND
@@ -128,7 +128,7 @@ GLOBAL_DATUM_INIT(captain_announcement, /datum/announcement/minor, new(do_newsca
 	is_command = 1
 	transfer_allowed = FALSE
 	minimal_player_age = 21
-	min_age_allowed = 30
+	min_age_type = JOB_MIN_AGE_COMMAND
 	blocked_race_for_job = list(SPECIES_VOX)
 	exp_requirements = 1200
 	exp_type = EXP_TYPE_COMMAND
@@ -180,7 +180,7 @@ GLOBAL_DATUM_INIT(captain_announcement, /datum/announcement/minor, new(do_newsca
 	is_command = 1
 	transfer_allowed = FALSE
 	minimal_player_age = 21
-	min_age_allowed = 30
+	min_age_type = JOB_MIN_AGE_HIGH_ED
 	blocked_race_for_job = list(SPECIES_VOX)
 	exp_requirements = 3000
 	exp_type = EXP_TYPE_SECURITY
@@ -238,7 +238,7 @@ GLOBAL_DATUM_INIT(captain_announcement, /datum/announcement/minor, new(do_newsca
 	is_legal = 1
 	transfer_allowed = FALSE
 	minimal_player_age = 30
-	min_age_allowed = 30
+	min_age_type = JOB_MIN_AGE_COMMAND
 	blocked_race_for_job = list(SPECIES_VOX)
 	exp_requirements = 1200
 	exp_type = EXP_TYPE_COMMAND
@@ -295,7 +295,7 @@ GLOBAL_DATUM_INIT(captain_announcement, /datum/announcement/minor, new(do_newsca
 	minimal_access = list(ACCESS_LAWYER, ACCESS_COURT, ACCESS_SEC_DOORS, ACCESS_MAINT_TUNNELS, ACCESS_RESEARCH, ACCESS_MEDICAL, ACCESS_CONSTRUCTION, ACCESS_MAILSORTING)
 	alt_titles = list("Human Resources Agent","Lawyer","Attorney")
 	minimal_player_age = 30
-	min_age_allowed = 30
+	min_age_type = JOB_MIN_AGE_HIGH_ED
 	blocked_race_for_job = list(SPECIES_VOX)
 	exp_requirements = 3000
 	exp_type = EXP_TYPE_CREW
