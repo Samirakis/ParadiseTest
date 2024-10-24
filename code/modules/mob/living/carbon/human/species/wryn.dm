@@ -71,6 +71,12 @@
 	blood_species = "Wryn"
 	//Default styles for created mobs.
 	default_hair = "Antennae"
+	age_sheet = list(
+		SPECIES_AGE_MIN = 15,
+		SPECIES_AGE_MAX = 55,
+		JOB_MIN_AGE_HIGH_ED = 22,
+		JOB_MIN_AGE_COMMAND = 22,
+	)
 
 /datum/species/wryn/on_species_gain(mob/living/carbon/human/H)
 	. = ..()

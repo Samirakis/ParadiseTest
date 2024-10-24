@@ -128,9 +128,10 @@
 /// Tags for 'age needed for this job' list.
 #define SPECIES_AGE_MIN		"Min"
 #define SPECIES_AGE_MAX		"Max"
-#define JOB_MIN_AGE_REGULAR	"Regular"
 #define JOB_MIN_AGE_HIGH_ED	"Higher Education"
 #define JOB_MIN_AGE_COMMAND	"Command"
+
+#define AGE_SHEET	list(SPECIES_AGE_MIN = 18, SPECIES_AGE_MAX = 85, JOB_MIN_AGE_HIGH_ED = 30, JOB_MIN_AGE_COMMAND = 30)
 
 
 // Defines just for parallax because its levels make storing it in the regular prefs a pain in the ass

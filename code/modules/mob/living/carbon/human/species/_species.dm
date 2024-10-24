@@ -273,6 +273,26 @@
 	return species_language.get_random_name(gender)
 
 
+/proc/get_age_limits(datum/species/species, list/tags)
+	if(!islist(tags))
+		tags = list(tags)
+
+	var/list/result = list()
+	for(var/tag in tags)
+		if(species)
+			result[tag] = LAZYACCESS(species.age_sheet, tag)
+
+		if(!isnum(result[tag]))
+			result[tag] = AGE_SHEET[tag]
+
+	return length(result) > 1 ? result : result[tags[1]]
+
+
+/proc/get_rand_age(datum/species/species)
+	var/age_limits = get_age_limits(species, list(SPECIES_AGE_MIN, SPECIES_AGE_MAX))
+	return rand(age_limits[SPECIES_AGE_MIN], age_limits[SPECIES_AGE_MAX])
+
+
 /**
  * Handles creation of mob organs.
  *

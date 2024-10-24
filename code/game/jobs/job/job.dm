@@ -56,7 +56,7 @@
 	var/exp_max = 0	//Max EXP, then hide
 	var/exp_type_max = ""
 
-	var/JOB_MIN_AGE_type = JOB_MIN_AGE_REGULAR
+	var/min_age_type = SPECIES_AGE_MIN
 	var/disabilities_allowed = 1
 	var/transfer_allowed = TRUE // If false, ID computer will always discourage transfers to this job, even if player is eligible
 	var/hidden_from_job_prefs = FALSE // if true, job preferences screen never shows this job.
@@ -144,8 +144,7 @@
 		return
 
 	var/datum/species/species = GLOB.all_species[C.prefs.species]
-
-	if(C.prefs.age >= species.age_sheet[JOB_MIN_AGE_type])
+	if(C.prefs.age >= get_age_limits(species, min_age_type))
 		. = TRUE
 
 
