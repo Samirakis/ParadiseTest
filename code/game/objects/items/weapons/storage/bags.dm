@@ -429,6 +429,109 @@
 	)
 	resistance_flags = FLAMMABLE
 
+
+/*
+	Combinated bags+reagents containers, used for pans and cookpots
+*/
+/obj/item/storage/combinated
+	name = " "
+	desc = " "
+	icon = 'icons/obj/food/containers.dmi'
+	icon_state = "pan"
+	item_state = "pan"
+	w_class = WEIGHT_CLASS_BULKY
+	force = 10
+	flags = CONDUCT
+	materials = list(MAT_METAL=3000)
+	storage_slots = 5
+	can_hold = list(/obj/item/reagent_containers/food)
+	var/food_container
+	var/reagents_storage = 10 // the amount of liquid that can be stored in the container
+
+/obj/item/storage/combinated/Initialize()
+	create_reagents(reagents_storage)
+	. = ..()
+
+/obj/item/storage/combinated/examine(mob/user)
+	. = ..()
+	if(reagents.total_volume)
+		. += span_notice("Содержит [reagents.total_volume]u жидкости.")
+
+/obj/item/storage/combinated/attackby(obj/item, mob/user)
+	if(istype(item, /obj/item/reagent_containers) && item.is_drainable())
+		var/trans = item.reagents.trans_to(src, 10)
+		if(trans)
+			to_chat(user, span_notice("Вы перелили [trans]u жидкости в [src.declent_ru(ACCUSATIVE)]."))
+			return
+	. = ..()
+
+/obj/item/storage/combinated/wash(mob/user, atom/source)
+	if(reagents.total_volume >= reagents_storage)
+		user.balloon_alert(user, "ёмкость заполнена!")
+		return
+	reagents.add_reagent("water", min(reagents_storage - reagents.total_volume, 10))
+	to_chat(user, span_notice("Вы пополнили [src.declent_ru(ACCUSATIVE)] водой из раковины."))
+	return
+
+/obj/item/storage/combinated/can_be_inserted(obj/item/W, stop_messages = TRUE) //stop messages
+	. = ..()
+
+/obj/item/storage/combinated/afterattack(obj/target, mob/user, proximity)
+	if(!proximity)
+		return
+	if(target.is_refillable())
+		if(!reagents.total_volume)
+			user.balloon_alert(user, "в [src.declent_ru(DATIVE)] нет жидкости!")
+			return
+
+		if(target.reagents.holder_full())
+			user.balloon_alert(user, "ёмкость заполнена!")
+			return
+
+		var/trans = reagents.trans_to(target, 10)
+		to_chat(user, span_notice("Вы перелили [trans]u жидкости в [target.declent_ru(ACCUSATIVE)]."))
+
+	else if(target.is_drainable())
+		if(!target.reagents.total_volume)
+			user.balloon_alert(user, "ёмкость пуста!")
+			return
+
+		if(reagents.holder_full())
+			user.balloon_alert(user, "в [src.declent_ru(DATIVE)] нет места!")
+			return
+
+		var/trans = target.reagents.trans_to(src, 10)
+		to_chat(user, span_notice("Вы пополнили сковороду при помощи [target.declent_ru(GENITIVE)] на [trans]u.)"))
+
+	else if(reagents.total_volume || length(contents))
+		if(user.a_intent == INTENT_HARM)
+			user.visible_message(span_danger("[user] вывали[pluralize_ru(user.gender, "ет", "ют")] содержимое [src.declent_ru(GENITIVE)] на [target]!"), \
+												span_notice("Вы вываливаете содержимое [src.declent_ru(GENITIVE)] на [target]."))
+			reagents.reaction(target, REAGENT_TOUCH)
+			reagents.clear_reagents()
+
+			var/turf/object_turf = get_turf(target)
+			for(var/obj/item/reagent_containers/food in contents)
+				remove_from_storage(food, object_turf)
+			update_icon()
+
+/obj/item/storage/combinated/pan
+	name = "pan"
+	icon = 'icons/obj/food/containers.dmi'
+	icon_state = "pan"
+	item_state = "pan"
+	desc = "Сковорода. Надо же."
+	ru_names = list(NOMINATIVE = "сковорода", GENITIVE = "сковороды", DATIVE = "сковороде", ACCUSATIVE = "сковороду", INSTRUMENTAL = "сковородой", PREPOSITIONAL = "сковороде")
+
+/obj/item/storage/combinated/cookpot
+	name = "cookpot"
+	icon = 'icons/obj/food/containers.dmi'
+	icon_state = "cookpot"
+	item_state = "pan"
+	desc = "Кастрюля! Настоящая!"
+	reagents_storage = 40
+	ru_names = list(NOMINATIVE = "кастрюля", GENITIVE = "кастрюли", DATIVE = "кастрюле", ACCUSATIVE = "кастрюлю", INSTRUMENTAL = "кастрюлей", PREPOSITIONAL = "кастрюле")
+
 /*
  * Trays - Agouri
  */

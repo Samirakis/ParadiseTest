@@ -447,3 +447,6 @@
 	throw_range = 3
 	w_class = WEIGHT_CLASS_SMALL
 	attack_verb = list("bashed", "slashed", "pricked", "thrashed")
+
+
+/// Spoon and Cook update items
